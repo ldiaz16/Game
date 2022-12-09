@@ -1,6 +1,10 @@
+
 import pygame
 import pygame_menu
+
+
 from src.sprite import Sprite
+
 pygame.init()
 WIDTH, HEIGHT = 800, 430
 SCREEN = pygame.display.set_mode(size = (WIDTH,HEIGHT))
@@ -12,23 +16,34 @@ CLOCK = pygame.time.Clock()
 
 class controller:
   def __init__(self):
+      self.start_menu()
+  def start_menu(self):
       self.menu = pygame_menu.Menu("Jumpy Crab", WIDTH, HEIGHT, position=(10,10),theme=pygame_menu.themes.THEME_BLUE)
-      # Create a font object with the FONT_8BIT font and size
       self.menu.add.label('Welcome', font_name = FONT)
-      self.menu.add.button("Press to Begin", self.game_stage1, font_name = FONT)
+      self.menu.add.button("Set your difficulty", font_name = FONT)
+      self.menu.add.button("Easy", self.game_stage1, 0.54, 10, font_name = FONT)
+      self.menu.add.button("Medium", self.game_stage1, 0.38, 8, font_name = FONT)
+      self.menu.add.button("Hard", self.game_stage1, 0.22, 6, font_name = FONT)
+      self.high_score = 0
       pygame.display.update()
       self.menu.mainloop(SCREEN)
 
-  def quit_menu(self):
+
+  def quit_menu(self,count):
+      if count > self.high_score:
+          self.high_score = count
       self.menu = pygame_menu.Menu("Death by crab", WIDTH, HEIGHT, position=(10,10), theme=pygame_menu.themes.THEME_ORANGE)
       self.menu.add.label('You died but its ok crabs are difficult', font_name = FONT, font_size = 22)
-      self.menu.add.button("Play Again", self.game_stage1, font_name = FONT)
+      high_score_statement = 'Your High Score Is ' + str(self.high_score)
+      self.menu.add.label(high_score_statement, font_name = FONT, font_size = 24)
+      self.menu.add.button("Play Again", self.start_menu, font_name = FONT)
       self.menu.add.label('Or', font_name = FONT)
       self.menu.add.button("Quit", self.quit_game, font_name = FONT)
       pygame.display.update()
       self.menu.mainloop(SCREEN)
 
-  def quit_game(self):
+  def quit_game(self,x):
+
     exit() 
   
   def mainloop(self):
@@ -40,32 +55,29 @@ class controller:
           exit()
              
 
-  def game_stage1(self):
+  def game_stage1(self, x, y):
     sprite = Sprite()
     pos = -6.5
-    font = pygame.font.Font(None, 30)
+    gravity = x
+    grav2 = y
     while True:
       CLOCK.tick(FPS)
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
           exit()
           pygame.display.update()
-        elif event.type == pygame.KEYUP:
-            pos = -6.5
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
           if event.key == pygame.K_SPACE:
+            pos = -1 * grav2
             sprite.is_jumping = True
-            pos = -6.5
 
-
-
+      sprite.count()
       sprite.draw()
       sprite.walking(pos)
-      sprite.jumping()
+      sprite.jumping(gravity)
       sprite.collision()
-      sprite.count()
       if sprite.game_over:
-        self.quit_menu()
+        self.quit_menu(sprite.collision())
       pygame.display.update()
       SCREEN.blit(BACKGROUND, BACKGROUND.get_rect())
       SCREEN.blit(FLOOR, (0,330))

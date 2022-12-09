@@ -54,36 +54,33 @@ class Sprite:
     for y in range(len(self.cloud_x)):
         if self.cloud_x[y] <= -130:
           self.cloud_x[y] = 800
-          
+
     for i in range(len(self.crab_x)):
       self.screen.blit(self.crab_image,(self.crab_x[i], self.crab_y))
       self.crab_rects[i].x = self.crab_x[i]
-    for i in range(len(self.cloud_x)): 
+    for i in range(len(self.cloud_x)):
       self.screen.blit(CLOUD, (self.cloud_x[i], self.cloud_y))
     if self.is_jumping == False:
       self.screen.blit(self.sprite_image,(self.sprite_x, self.sprite_y))
     else:
       self.screen.blit(self.jump_image,(self.sprite_x,self.sprite_y))
-      
+
     pygame.draw.rect(self.screen, (255, 255, 255), self.sprite_rect, 1)
 
   def count(self):
     font = pygame.font.Font(None, 30)
-    for x in self.crab_x:
-      if x < -41:
-        self.counter += 1
     self.score_label = "Your score: " + str(self.counter)
     text = font.render(self.score_label, True, (255, 255, 255))
-    self.screen.blit(text, (10, 10))
+    self.screen.blit(text, (650, 10))
 
 
-      
-  def walking(self,pos): 
+
+  def walking(self,pos):
     if pos != 0:
       for x in range(len(self.crab_x)):
         self.crab_x[x] += pos
       for y in range(len(self.cloud_x)):
-        self.cloud_x[y] += (pos + 1)   
+        self.cloud_x[y] += (pos + 1)
       self.sprite_speed -= 1
       if self.sprite_speed == 0:
         self.sprite_speed = self.initial_sprite_speed
@@ -93,39 +90,43 @@ class Sprite:
           self.sprite_index += 1
       self.crab_image = CRAB_LIST[self.sprite_index]
       self.sprite_image = WALK_LIST[self.sprite_index]
-      
 
-  def jumping(self):
+
+  def jumping(self, var):
       if self.is_jumping:
         if self.jump_index >= -10:
           neg = 1
+          self.jump_image = JUMP_LIST[0]
           if self.jump_index < 0:
-            neg = -1     
+            neg = -1
             self.jump_image = JUMP_LIST[1]
-          self.sprite_rect.y -= self.jump_index**2 * 0.3 * neg
-          self.sprite_y -= self.jump_index**2 * 0.2 * neg
+          self.sprite_rect.y -= self.jump_index**2 * var * neg
+          self.sprite_y -= self.jump_index**2 * var * neg
           self.jump_index -= 1
         else:
           self.is_jumping = False
-          self.jump_index = 10    
-        self.sprite_rect = pygame.Rect(self.sprite_x, self.sprite_y, SPRITE_SIZE[0], SPRITE_SIZE[1]-10)
-      self.jump_image = JUMP_LIST[0]
 
-    
+          self.jump_index = 10
+        self.sprite_rect = pygame.Rect(self.sprite_x, self.sprite_y, SPRITE_SIZE[0], SPRITE_SIZE[1]-10)
+
+
+
+
   def collision(self):
     if self.sprite_rect.collidelist(self.crab_rects) != -1:
         self.game_over = True
+        return self.counter
   # Check if the sprite and crab are colliding
-    #return self.game_over 
-      
-      
-   
+    #return self.game_over
 
 
-          
-      
 
-      
-    
 
-  
+
+
+
+
+
+
+
+
